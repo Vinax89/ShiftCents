@@ -1,3 +1,4 @@
+
 // src/lib/hardware/native.ts
 import type { Hardware } from './types'
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera'
