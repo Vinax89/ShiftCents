@@ -61,8 +61,8 @@
     "react-hook-form": "^7.54.2",
     "recharts": "^3.0.0",
     "tailwind-merge": "^3.0.1",
-    "tailwindcss-animate": "^1.0.7",
-    "zod": "^4.0.0-beta.23",
+    "tailwindcss-animate": "^1.0.0",
+    "zod": "^3.23.8",
     "zustand": "^5.0.0"
   },
   "devDependencies": {
