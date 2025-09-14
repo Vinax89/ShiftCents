@@ -9,7 +9,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "build:prod": "NODE_ENV=production next build",
+    "serve:prod": "NODE_ENV=production next build && NODE_ENV=production next start -p 9000",
+    "clean:artifacts": "rimraf .next .turbo .eslintcache .cache .vercel functions/lib"
   },
   "dependencies": {
     "@capacitor-firebase/messaging": "^6.0.0",
@@ -85,5 +88,6 @@
     "typescript": "5.5.2",
     "vitest": "^2.0.2",
     "web-vitals": "^4.2.1"
-  }
+  },
+  "packageManager": "pnpm@10.16.1+sha512.0e155aa2629db8672b49e8475da6226aa4bdea85fdcdfdc15350874946d4f3c91faaf64cbdc4a5d1ab8002f473d5c3fcedcd197989cf0390f9badd3c04678706"
 }
