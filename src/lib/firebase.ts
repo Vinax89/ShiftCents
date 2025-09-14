@@ -19,7 +19,7 @@ function ensureApp(): FirebaseApp {
 const firebaseApp = ensureApp()
 const app = firebaseApp
 const auth: Auth = getAuth(firebaseApp)
-const db: Firestore = getFirestore(firebaseApp)
+let db: Firestore = getFirestore(firebaseApp)
 
 if (typeof window !== 'undefined') {
   try {
