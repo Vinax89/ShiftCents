@@ -1,7 +1,7 @@
 // src/lib/firebase.ts
 import { initializeApp, getApp, getApps } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
+import { getFirestore, enableIndexedDbPersistence } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 
 const firebaseConfig = {
@@ -18,5 +18,21 @@ const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
+
+if (typeof window !== 'undefined') {
+  try {
+    enableIndexedDbPersistence(db)
+      .then(() => console.log('Firestore persistence enabled'))
+      .catch((err) => {
+        if (err.code == 'failed-precondition') {
+          console.warn('Firestore persistence failed: Multiple tabs open');
+        } else if (err.code == 'unimplemented') {
+          console.log('Firestore persistence not available');
+        }
+      });
+  } catch (error) {
+    console.error("Error enabling Firestore persistence:", error);
+  }
+}
 
 export { app, auth, db, storage };
