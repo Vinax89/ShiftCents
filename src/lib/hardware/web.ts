@@ -7,7 +7,8 @@ async function pwaCapture(): Promise<PhotoCapture|null> {
   // This is a simplified version. A real implementation would involve a hidden file input
   // triggered by a button, and would return a file handler.
   console.log("PWA camera capture simulation.");
-  return null;
+  // Simulate a successful capture for demonstration purposes.
+  return { uri: 'https://picsum.photos/seed/receipt-capture/400/600', mime: 'image/jpeg' };
 }
 
 export const webHardware: Hardware = {
