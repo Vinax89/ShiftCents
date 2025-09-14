@@ -13,6 +13,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Camera } from 'lucide-react';
 import Image from 'next/image';
+import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 interface Receipt {
   id: number;
@@ -22,11 +23,12 @@ interface Receipt {
   date: string;
   category?: string;
   confidence?: number;
+  imageHint?: string;
 }
 
 const initialReceipts: Receipt[] = [
-    { id: 1, uri: 'https://picsum.photos/seed/receipt1/400/600', merchant: 'Grocery Mart', amount: '45.67', date: '2024-07-20'},
-    { id: 2, uri: 'https://picsum.photos/seed/receipt2/400/600', merchant: 'The Coffee Spot', amount: '8.50', date: '2024-07-19'},
+    { id: 1, uri: PlaceHolderImages[0].imageUrl, merchant: 'Grocery Mart', amount: '45.67', date: '2024-07-20', imageHint: PlaceHolderImages[0].imageHint},
+    { id: 2, uri: PlaceHolderImages[1].imageUrl, merchant: 'The Coffee Spot', amount: '8.50', date: '2024-07-19', imageHint: PlaceHolderImages[1].imageHint},
 ];
 
 export default function ReceiptPage() {
@@ -105,7 +107,7 @@ export default function ReceiptPage() {
         {receipts.map(receipt => (
           <Card key={receipt.id}>
             <CardHeader>
-              <Image src={receipt.uri} alt={`Receipt from ${receipt.merchant}`} width={400} height={600} className="rounded-t-lg aspect-[2/3] object-cover" />
+              <Image src={receipt.uri} alt={`Receipt from ${receipt.merchant}`} width={400} height={600} className="rounded-t-lg aspect-[2/3] object-cover" data-ai-hint={receipt.imageHint} />
             </CardHeader>
             <CardContent>
                 <CardTitle>{receipt.merchant}</CardTitle>
