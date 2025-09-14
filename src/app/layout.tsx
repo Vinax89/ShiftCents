@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/toaster';
 import Providers from './providers';
 import PushInit from './push-init';
+import { SessionProvider } from '@/hooks/use-auth';
 
 export const metadata: Metadata = {
   title: 'ShiftCents',
@@ -28,7 +29,9 @@ export default function RootLayout({
       </head>
       <body className={cn('font-body antialiased')}>
         <Providers>
-          {children}
+          <SessionProvider>
+            {children}
+          </SessionProvider>
         </Providers>
         <Toaster />
         <PushInit />

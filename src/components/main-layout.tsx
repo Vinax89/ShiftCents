@@ -8,6 +8,8 @@ import {
   CircleDollarSign,
   Goal,
   LayoutDashboard,
+  LogOut,
+  User,
   Wallet,
 } from 'lucide-react';
 
@@ -21,7 +23,7 @@ import {
   SidebarMenuButton,
   SidebarInset,
   SidebarTrigger,
-  useSidebar,
+  SidebarFooter,
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
 import { Logo } from '@/components/logo';
@@ -31,6 +33,9 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { hardware } from '@/lib/hardware';
 import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
+import { useAuth } from '@/hooks/use-auth';
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from './ui/dropdown-menu';
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -42,6 +47,7 @@ const navItems = [
 ];
 
 export function MainLayout({ children }: { children: React.ReactNode }) {
+  const { user, signOut } = useAuth();
   const isMobile = useIsMobile();
   const { toast } = useToast();
   const [isCapturing, setIsCapturing] = useState(false);
@@ -94,6 +100,36 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
               ))}
             </SidebarMenu>
           </SidebarContent>
+          <SidebarFooter>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="justify-start w-full p-2 h-auto">
+                   <div className="flex items-center gap-2">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={user?.photoURL || undefined} />
+                      <AvatarFallback>{user?.email?.charAt(0).toUpperCase()}</AvatarFallback>
+                    </Avatar>
+                    <div className="flex flex-col items-start">
+                      <span className="text-sm font-medium">{user?.displayName || user?.email}</span>
+                      <span className="text-xs text-muted-foreground">View Profile</span>
+                    </div>
+                  </div>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56 mb-2">
+                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>
+                  <User className="mr-2 h-4 w-4" />
+                  <span>Profile</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={signOut}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Log out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </SidebarFooter>
         </Sidebar>
         <SidebarInset>
           <header className="flex h-14 items-center gap-4 border-b bg-background/95 px-4 sticky top-0 z-40 backdrop-blur-sm lg:px-6">
