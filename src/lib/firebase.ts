@@ -17,7 +17,7 @@ let auth: Auth | null = null;
 let db: Firestore | null = null;
 
 
-function ensureApp(): FirebaseApp {
+function ensureApp(): FirebaseApp | null {
     if (firebaseApp) return firebaseApp;
     if (getApps().length) {
         firebaseApp = getApp();
@@ -25,31 +25,18 @@ function ensureApp(): FirebaseApp {
         firebaseApp = initializeApp(firebaseConfig);
     } else {
         console.warn("Firebase config is missing, app functionality will be limited.");
-        // Return a mock/dummy app object if you want to avoid crashes elsewhere
-        // For now, we'll let parts of the app that need firebase fail if not configured.
-        throw new Error("Firebase configuration is missing.");
     }
     return firebaseApp;
 }
 
 try {
     const app = ensureApp();
-    auth = getAuth(app);
-    db = getFirestore(app);
-
-    if (typeof window !== 'undefined') {
-        enableIndexedDbPersistence(db)
-            .then(() => console.log('Firestore persistence enabled'))
-            .catch((err) => {
-            if (err.code == 'failed-precondition') {
-                console.warn('Firestore persistence failed: Multiple tabs open');
-            } else if (err.code == 'unimplemented') {
-                console.log('Firestore persistence not available');
-            }
-            });
+    if (app) {
+        auth = getAuth(app);
+        db = getFirestore(app);
     }
 } catch (e) {
-    console.error(e);
+    console.error("Error initializing Firebase:", e);
 }
 
 
@@ -57,12 +44,14 @@ const app = firebaseApp;
 export { firebaseApp, app, auth, db }
 
 export async function getAuthLazy(): Promise<Auth | null> {
-  if (!firebaseApp) return null;
+  const app = ensureApp();
+  if (!app) return null;
   const { getAuth } = await import('firebase/auth')
-  return getAuth(firebaseApp)
+  return getAuth(app)
 }
 export async function getFirestoreLazy(): Promise<Firestore | null> {
-  if (!firebaseApp) return null;
+  const app = ensureApp();
+  if (!app) return null;
   const { getFirestore } = await import('firebase/firestore')
-  return getFirestore(firebaseApp)
+  return getFirestore(app)
 }
