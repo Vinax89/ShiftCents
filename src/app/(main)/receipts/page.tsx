@@ -1,6 +1,6 @@
 'use client';
 import { hardware } from '@/lib/hardware';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { receiptAutoLabeling } from '@/ai/flows/receipt-auto-labeling';
 import { Button } from '@/components/ui/button';
 import {
@@ -35,18 +35,9 @@ export default function ReceiptPage() {
   const [busy, setBusy] = useState(false);
   const { toast } = useToast();
   const [receipts, setReceipts] = useState<Receipt[]>(initialReceipts);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  async function captureAndLabel() {
-    setBusy(true);
-    hardware.vibrate('light');
-    const photo = await hardware.cameraCapture({ quality: 80 });
-
-    if (!photo || !photo.uri) {
-      toast({ title: 'Capture cancelled', variant: 'destructive' });
-      setBusy(false);
-      return;
-    }
-
+  async function processPhoto(photoUri: string) {
     toast({ title: 'Receipt captured!', description: 'Analyzing with AI...' });
     
     // Mock data for AI call
@@ -62,7 +53,7 @@ export default function ReceiptPage() {
         hardware.vibrate('medium');
         const newReceipt: Receipt = {
             id: receipts.length + 1,
-            uri: photo.uri,
+            uri: photoUri,
             merchant: mockData.merchant,
             amount: (mockData.amountCents / 100).toFixed(2),
             date: mockData.dateISO.split('T')[0],
@@ -84,6 +75,44 @@ export default function ReceiptPage() {
     }
   }
 
+
+  async function captureAndLabel() {
+    setBusy(true);
+    hardware.vibrate('light');
+
+    if ((globalThis as any).Capacitor) {
+      const photo = await hardware.cameraCapture({ quality: 80 });
+      if (!photo || !photo.uri) {
+        toast({ title: 'Capture cancelled', variant: 'destructive' });
+        setBusy(false);
+        return;
+      }
+      await processPhoto(photo.uri);
+    } else {
+      // Web implementation
+      fileInputRef.current?.click();
+    }
+  }
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        if (e.target?.result) {
+          processPhoto(e.target.result as string);
+        } else {
+          toast({ title: 'Could not read file', variant: 'destructive' });
+          setBusy(false);
+        }
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setBusy(false); // No file selected
+    }
+  };
+
+
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
@@ -102,6 +131,16 @@ export default function ReceiptPage() {
           Scan Receipt
         </Button>
       </div>
+      
+      <input
+        type="file"
+        accept="image/*"
+        capture="environment"
+        ref={fileInputRef}
+        onChange={handleFileChange}
+        className="hidden"
+        disabled={busy}
+      />
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {receipts.map(receipt => (
