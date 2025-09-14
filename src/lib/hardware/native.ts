@@ -1,28 +1,13 @@
 // src/lib/hardware/native.ts
 import type { Hardware } from './types'
-/*
-// UNCOMMENT THE FOLLOWING ONCE CAPACITOR IS FULLY CONFIGURED
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera'
 import { Haptics, ImpactStyle } from '@capacitor/haptics'
 import { Share } from '@capacitor/share'
 import { Device } from '@capacitor/device'
 import { PushNotifications } from '@capacitor/push-notifications'
-import { Preferences } from '@capacitor/preferences' // for non-secrets
-*/
-
-// Mock implementations to avoid breaking the build before Capacitor is set up.
-const Camera = { getPhoto: async () => ({ webPath: 'https://picsum.photos/seed/receipt/400/600' }) };
-const CameraResultType = { Uri: 'Uri' };
-const CameraSource = { Prompt: 'Prompt' };
-const Haptics = { impact: async () => {} };
-const ImpactStyle = { Heavy: 'Heavy', Medium: 'Medium', Light: 'Light' };
-const Share = { share: async () => {} };
-const Device = { getInfo: async () => ({ platform: 'web', model: 'unknown', operatingSystem: 'unknown' }) };
-const PushNotifications = { requestPermissions: async () => {}, register: async () => {}, addListener: (event: string, cb: any) => {} };
-const Preferences = { get: async (o: {key:string}) => ({value: null}), set: async (o:{key:string, value:string}) => {}, remove: async(o:{key:string}) => {} };
-
-
+import { Preferences } from '@capacitor/preferences' // for non‑secrets
 // For secrets use a secure storage plugin suited to Keychain/EncryptedSharedPreferences
+
 
 export const nativeHardware: Hardware = {
   async cameraCapture(){
