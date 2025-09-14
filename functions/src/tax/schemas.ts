@@ -3,15 +3,15 @@ import { z } from 'zod'
 export const Filing = z.enum(['single','married','head'])
 export type Filing = z.infer<typeof Filing>
 
-// Source registry
 export const Src = z.object({
   kind: z.enum(['csv','xlsx','html','pdf','fixed']),
   url: z.string().url().optional(),
   note: z.string().optional(),
   selector: z.string().optional(),
   sheet: z.string().optional(),
-  headers: z.array(z.string()).optional(),
-  // Hints for adapters
+  // Mapping chosen in Admin UI (used by adapters)
+  columns: z.object({ upto: z.string().optional(), rate: z.string().optional(), tax: z.string().optional() }).optional(),
+  // Hints (optional)
   tableType: z.enum(['percentage','wageBracket','fixed']).optional(),
   schedule: z.enum(['weekly','biweekly','semimonthly','monthly']).optional(),
   filing: Filing.optional(),
@@ -21,8 +21,8 @@ export const Src = z.object({
   nonResidentRate: z.number().optional(),
 })
 
-export const CompTable = z.object({ filing: Filing, bands: z.array(z.tuple([ z.number(), z.number() ])) }) // [upto, rate]
-export const CompWageBracket = z.object({ filing: Filing, rows: z.array(z.tuple([ z.number(), z.number() ])) }) // [upto, taxAmount]
+export const CompTable = z.object({ filing: Filing, bands: z.array(z.tuple([ z.number(), z.number() ])) })
+export const CompWageBracket = z.object({ filing: Filing, rows: z.array(z.tuple([ z.number(), z.number() ])) })
 
 export const CompPerPeriod = z.object({
   weekly: z.object({ percentage: z.array(CompTable).optional(), wageBracket: z.array(CompWageBracket).optional() }).partial().optional(),
@@ -49,11 +49,10 @@ export const CompiledCorpus = z.object({
 })
 export type CompiledCorpus = z.infer<typeof CompiledCorpus>
 
-// Registry document per year
 export const Registry = z.object({
   year: z.number(),
-  federal: z.record(Src),                     // e.g., { percentage: Src, wageBracket_weekly: Src, ... }
-  states: z.record(z.record(Src)),            // e.g., { CA: { percentage: Src, wageBracket_biweekly: Src } }
-  localities: z.record(z.record(Src)),        // e.g., { NYC: { percentage: Src }, PHL: { fixed: Src } }
+  federal: z.record(Src),
+  states: z.record(z.record(Src)),
+  localities: z.record(z.record(Src)),
 })
 export type Registry = z.infer<typeof Registry>
