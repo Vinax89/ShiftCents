@@ -1,6 +1,6 @@
-'use client';
-import { engine } from '@/lib/engine';
-import { useState } from 'react';
+'use client'
+import { useState } from 'react'
+import { engine } from '@/lib/engine'
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -18,7 +18,7 @@ export default function ViabilityPage() {
     setOut(null);
     try {
         const e = await engine();
-        const result = e.income_viability({
+        const result = await e.income_viability({
             year: new Date().getFullYear(),
             zip,
             grossAnnual: gross,

@@ -2,10 +2,13 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/toaster';
+import Providers from './providers';
+import PushInit from './push-init';
 
 export const metadata: Metadata = {
   title: 'ShiftCents',
   description: 'Finance app for shift workers',
+  manifest: '/manifest.webmanifest'
 };
 
 export default function RootLayout({
@@ -24,8 +27,11 @@ export default function RootLayout({
         />
       </head>
       <body className={cn('font-body antialiased')}>
-        {children}
+        <Providers>
+          {children}
+        </Providers>
         <Toaster />
+        <PushInit />
       </body>
     </html>
   );

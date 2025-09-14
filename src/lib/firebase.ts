@@ -1,8 +1,6 @@
-// src/lib/firebase.ts
-import { initializeApp, getApp, getApps } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
-import { getFirestore, enableIndexedDbPersistence } from 'firebase/firestore';
-import { getStorage } from 'firebase/storage';
+import { initializeApp, getApp, getApps, type FirebaseApp } from 'firebase/app'
+import { getAuth, type Auth } from 'firebase/auth'
+import { getFirestore, type Firestore, enableIndexedDbPersistence } from 'firebase/firestore'
 
 const firebaseConfig = {
   "projectId": "studio-7818144568-e6f2b",
@@ -13,11 +11,15 @@ const firebaseConfig = {
   "messagingSenderId": "575946598737"
 };
 
-// Initialize Firebase
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-const auth = getAuth(app);
-const db = getFirestore(app);
-const storage = getStorage(app);
+
+function ensureApp(): FirebaseApp {
+  return getApps().length ? getApp() : initializeApp(firebaseConfig as any)
+}
+
+const firebaseApp = ensureApp()
+const app = firebaseApp
+const auth: Auth = getAuth(firebaseApp)
+const db: Firestore = getFirestore(firebaseApp)
 
 if (typeof window !== 'undefined') {
   try {
@@ -35,4 +37,13 @@ if (typeof window !== 'undefined') {
   }
 }
 
-export { app, auth, db, storage };
+export { firebaseApp, app, auth, db }
+
+export async function getAuthLazy(): Promise<Auth> {
+  const { getAuth } = await import('firebase/auth')
+  return getAuth(firebaseApp)
+}
+export async function getFirestoreLazy(): Promise<Firestore> {
+  const { getFirestore } = await import('firebase/firestore')
+  return getFirestore(firebaseApp)
+}

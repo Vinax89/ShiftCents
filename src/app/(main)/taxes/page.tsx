@@ -1,6 +1,6 @@
-'use client';
-import { useState } from 'react';
-import { engine } from '@/lib/engine';
+'use client'
+import { useState } from 'react'
+import { engine } from '@/lib/engine'
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -18,7 +18,7 @@ export default function TaxesPage() {
     setOut(null);
     try {
       const e = await engine();
-      const result = e.tax_burden({
+      const result = await e.tax_burden({
         year: new Date().getFullYear(),
         zip,
         filing: 'single',

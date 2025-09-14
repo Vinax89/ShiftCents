@@ -1,0 +1,37 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{db}/documents {
+    function user(){ return get(/databases/$(db)/documents/users/$(request.auth.uid)).data; }
+    function isMember(t){ return request.auth != null && user().tenants[t] != null; }
+    function role(t){ return user().tenants[t]; }
+
+    match /users/{uid} { allow read, write: if request.auth != null && request.auth.uid == uid; }
+
+    match /tenants/{t} {
+      allow read: if isMember(t);
+      allow write: if role(t) in ['owner','admin'];
+
+      match /{coll=accounts|transactions|budgets|goals|cashflow|notifications}/{doc} {
+        allow read: if isMember(t);
+        allow create, update: if isMember(t);
+        allow delete: if role(t) in ['owner','admin'];
+      }
+
+      match /shifts/{id} { allow read, create, update: if isMember(t); allow delete: if role(t) in ['owner','admin']; }
+      match /bills/{id} { allow read, write: if isMember(t); }
+      match /paydays/{id} { allow read, write: if isMember(t); }
+
+      match /receipts/{id} {
+        allow read, create: if request.auth != null && isMember(t) && request.auth.uid == request.resource.data.ownerUid;
+        allow update: if isMember(t) && request.auth.uid == resource.data.ownerUid;
+        allow delete: if role(t) in ['owner','admin'];
+      }
+
+      match /audit_events/{doc} { allow read: if role(t) in ['owner','admin','auditor']; allow write: if false; }
+    }
+
+    match /system/localityMap/{zip} { allow read: if true; allow write: if false; }
+    match /system/taxRules/{year}/{doc=**} { allow read: if true; allow write: if false; }
+    match /system/colIndexes/{year}/{geo} { allow read: if true; allow write: if false; }
+  }
+}

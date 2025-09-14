@@ -1,6 +1,6 @@
 'use client';
 import { hardware } from '@/lib/hardware';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { receiptAutoLabeling } from '@/ai/flows/receipt-auto-labeling';
 import { Button } from '@/components/ui/button';
 import {
@@ -14,6 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2, Camera } from 'lucide-react';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
+import type { PhotoFile } from '@/lib/hardware/types';
 
 interface Receipt {
   id: number;
@@ -36,8 +37,8 @@ export default function ReceiptPage() {
   const { toast } = useToast();
   const [receipts, setReceipts] = useState<Receipt[]>(initialReceipts);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  async function processPhoto(photoUri: string) {
+  
+  async function processPhoto(photo: PhotoFile) {
     toast({ title: 'Receipt captured!', description: 'Analyzing with AI...' });
     
     // Mock data for AI call
@@ -53,7 +54,7 @@ export default function ReceiptPage() {
         hardware.vibrate('medium');
         const newReceipt: Receipt = {
             id: receipts.length + 1,
-            uri: photoUri,
+            uri: photo.uri,
             merchant: mockData.merchant,
             amount: (mockData.amountCents / 100).toFixed(2),
             date: mockData.dateISO.split('T')[0],
@@ -82,12 +83,12 @@ export default function ReceiptPage() {
 
     if ((globalThis as any).Capacitor) {
       const photo = await hardware.cameraCapture({ quality: 80 });
-      if (!photo || !photo.uri) {
+      if (!photo) {
         toast({ title: 'Capture cancelled', variant: 'destructive' });
         setBusy(false);
         return;
       }
-      await processPhoto(photo.uri);
+      await processPhoto(photo);
     } else {
       // Web implementation
       fileInputRef.current?.click();
@@ -100,7 +101,7 @@ export default function ReceiptPage() {
       const reader = new FileReader();
       reader.onload = (e) => {
         if (e.target?.result) {
-          processPhoto(e.target.result as string);
+          processPhoto({ uri: e.target.result as string, mime: file.type });
         } else {
           toast({ title: 'Could not read file', variant: 'destructive' });
           setBusy(false);

@@ -1,11 +1,12 @@
-// src/lib/messaging.ts
-
-// This is a placeholder for the actual Firebase Cloud Messaging registration logic.
-// A full implementation would involve initializing Firebase, getting the messaging instance,
-// and retrieving the token.
-
 export async function ensureFcmRegistration(): Promise<string | null> {
-  console.log("Simulating FCM registration...");
-  // In a real app, you would return the actual FCM token here.
-  return "dummy-fcm-token-for-web-simulation";
+  try {
+    const { isSupported, getMessaging, getToken } = await import('firebase/messaging')
+    if (!(await isSupported())) return null
+    const vapidKey = process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY
+    if (!vapidKey) return null
+    const m = getMessaging()
+    return await getToken(m, { vapidKey }).catch(() => null)
+  } catch {
+    return null
+  }
 }
