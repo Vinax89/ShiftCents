@@ -6,6 +6,8 @@ import { StatusItem, STATUS_META, StatusCode, Category, pct } from '@/lib/status
 import { StatusChip } from '@/components/status/StatusChip'
 import { StatusEditor } from '@/components/status/StatusEditor'
 import { ProgressBar } from '@/components/status/ProgressBar'
+import dynamic from 'next/dynamic'
+const BurndownSparkline = dynamic(()=> import('@/components/status/BurndownSparkline'), { ssr:false })
 
 async function seedIfEmpty(){
   if (!db) return false;
@@ -51,7 +53,8 @@ export default function AdminStatus(){
   return (
     <div className="space-y-6">
       <h1 className="text-xl font-semibold">Live App Status</h1>
-      <p className="text-sm opacity-80">Admin‑editable, realtime. Click a status to change it. Seed loads automatically if empty.</p>
+      <div className="text-sm opacity-80">Admin‑editable, realtime. Click a status to change it. Seed loads automatically if empty.</div>
+      <div className="mt-2"><BurndownSparkline /></div>
 
       {categories.map(cat => {
         const list = byCat[cat] || []
