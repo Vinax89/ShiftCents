@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { engine } from '@/lib/engine'
+import { ensureEngineInit } from '@/lib/engine-init'
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -17,6 +18,7 @@ export default function TaxesPage() {
     setLoading(true);
     setOut(null);
     try {
+      await ensureEngineInit()
       const e = await engine();
       const result = await e.tax_burden({
         year: new Date().getFullYear(),
