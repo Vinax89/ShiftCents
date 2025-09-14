@@ -1,3 +1,23 @@
+
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "receipt-1",
+      "description": "A scanned receipt from a grocery store",
+      "imageUrl": "https://picsum.photos/seed/receipt1/400/600",
+      "imageHint": "receipt grocery"
+    },
+    {
+      "id": "receipt-2",
+      "description": "A scanned receipt from a cafe",
+      "imageUrl": "https://picsum.photos/seed/receipt2/400/600",
+      "imageHint": "receipt coffee"
+    },
+    {
+      "id": "receipt-3",
+      "description": "A scanned receipt from a gas station",
+      "imageUrl": "https://picsum.photos/seed/receipt3/400/600",
+      "imageHint": "receipt fuel"
+    }
+  ]
 }
