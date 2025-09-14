@@ -140,7 +140,7 @@ function NavItem({
 
   return (
     <SidebarMenuItem>
-      <Link href={href} legacyBehavior passHref>
+      <Link href={href} passHref>
         <SidebarMenuButton isActive={isActive} tooltip={label}>
           <Icon />
           <span>{label}</span>
