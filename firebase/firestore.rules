@@ -1,13 +1,36 @@
+
 rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Default deny all
-    match /{document=**} {
-      allow read, write: if false;
+    // Live app status (signed‑in read; admin write)
+    match /system/appStatus {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.token.admin == true;
     }
-
-    // Official example cases (admin-curated) and verification runs
+    match /system/appStatus/items/{itemId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.token.admin == true;
+    }
+    match /system/appStatus/summary {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.token.admin == true;
+    }
+    // Per-pay verification samples (admin-only write)
+    match /system/taxPaySamples/{year} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.token.admin == true;
+      match /cases/{id} {
+        allow read: if request.auth != null;
+        allow write: if request.auth != null && request.auth.token.admin == true;
+      }
+    }
+    // Admin-editable tax registry
+    match /system/taxRegistry/{year} {
+      allow read: if request.auth != null; // anyone signed in can read
+      allow write: if request.auth != null && request.auth.token.admin == true; // only admins can write
+    }
+    // Official example cases (admin‑curated) and verification runs
     match /system/taxSamples/{year} {
       allow read: if request.auth != null; // any signed-in user can read examples
       allow write: if request.auth != null && request.auth.token.admin == true; // admins write
@@ -20,39 +43,8 @@ service cloud.firestore {
       allow read: if request.auth != null;
       allow write: if request.auth != null && request.auth.token.admin == true;
     }
-    
-    // Per-pay samples
-    match /system/taxPaySamples/{year} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null && request.auth.token.admin == true;
-      match /cases/{id} {
-        allow read: if request.auth != null;
-        allow write: if request.auth != null && request.auth.token.admin == true;
-      }
-    }
-
-    // Admin-editable tax registry
-    match /system/taxRegistry/{year} {
-      allow read: if request.auth != null; // anyone signed in can read
-      allow write: if request.auth != null && request.auth.token.admin == true; // only admins can write
-    }
-
-    // Mapper Memory: remembers chosen column mappings per domain (admin-only writes)
+    // Mapper Memory: remembers chosen column mappings per domain (admin‑only writes)
     match /system/taxMapperMemory/{domain} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null && request.auth.token.admin == true;
-    }
-    
-    // Live app status (signed-in read; admin write)
-    match /system/appStatus {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null && request.auth.token.admin == true;
-    }
-    match /system/appStatus/items/{itemId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null && request.auth.token.admin == true;
-    }
-    match /system/appStatus/summary {
       allow read: if request.auth != null;
       allow write: if request.auth != null && request.auth.token.admin == true;
     }
