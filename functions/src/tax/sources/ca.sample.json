@@ -1,0 +1,1 @@
+{ "name":"ca", "tables":[ { "filing":"single", "brackets":[ {"upto":10412, "rate":0.01},{"upto":24684, "rate":0.02},{"upto":38959, "rate":0.04},{"upto":54081, "rate":0.06},{"upto":68350, "rate":0.08},{"upto":349137, "rate":0.093},{"upto":418961, "rate":0.103},{"upto":698271, "rate":0.113},{"upto":1000000, "rate":0.123},{"upto":null, "rate":0.133} ] } ] }

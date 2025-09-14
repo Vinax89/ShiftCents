@@ -2,10 +2,9 @@ import { getFirestore, doc, getDoc } from 'firebase/firestore'
 import { engine } from './engine'
 import { db } from './firebase'
 
-let inited = false
-
+let inited=false
 export async function ensureEngineInit(year = new Date().getFullYear()){
-  if (inited || !db) return
+  if (inited || !db) return;
   // Load compiled tax corpus; pass to WASM init if available
   try {
     const snap = await getDoc(doc(db, `system/taxRules/${year}/compiled`))

@@ -1,0 +1,3 @@
+{ "name":"federal", "tables":[
+  { "filing":"single", "brackets":[ {"upto":11000, "rate":0.10},{"upto":44725, "rate":0.12},{"upto":95375, "rate":0.22},{"upto":182100, "rate":0.24},{"upto":231250, "rate":0.32},{"upto":578125, "rate":0.35},{"upto":null, "rate":0.37} ] }
+] }
