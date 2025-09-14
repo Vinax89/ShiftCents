@@ -1,12 +1,12 @@
 'use client'
 import { useEffect, useMemo, useState } from 'react'
-import { collection, doc, getDoc, getDocs, onSnapshot, query, setDoc } from 'firebase/firestore'
+import dynamic from 'next/dynamic'
+import { collection, doc, getDocs, onSnapshot, query, setDoc, orderBy } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
-import { StatusItem, STATUS_META, StatusCode, Category, pct } from '@/lib/status/types'
-import { StatusChip } from '@/components/status/StatusChip'
+import { StatusItem, StatusCode, Category, pct } from '@/lib/status/types'
 import { StatusEditor } from '@/components/status/StatusEditor'
 import { ProgressBar } from '@/components/status/ProgressBar'
-import dynamic from 'next/dynamic'
+
 const BurndownSparkline = dynamic(()=> import('@/components/status/BurndownSparkline'), { ssr:false })
 
 async function seedIfEmpty(){
@@ -23,6 +23,7 @@ async function seedIfEmpty(){
 export default function AdminStatus(){
   const [items,setItems] = useState<StatusItem[]>([])
   const [byCat,setByCat] = useState<Record<string,StatusItem[]>>({})
+  const [catFilter,setCatFilter] = useState<Category|'ALL'>('ALL')
 
   useEffect(()=>{
     if (!db) return;
@@ -50,11 +51,55 @@ export default function AdminStatus(){
 
   const categories: Category[] = ['SPEC-R','R11-EXT','SPEC-UI','FEATURE','PLATFORM']
 
+  async function exportHistoryCSV(){
+    // Pull all history docs and emit CSV for either ALL or selected category
+    if (!db) return;
+    const qy = query(collection(db, 'system/appStatus/history'), orderBy('ts','asc'))
+    const snap = await getDocs(qy)
+    const rows: any[] = []
+    for (const d of snap.docs){
+      const x: any = d.data()
+      const ts = x.ts
+      let pctDone: number | null = null
+      if (catFilter==='ALL'){
+        pctDone = typeof x.pct === 'number' ? x.pct : (x.total ? Math.round(((x.done||0)/(x.total||1))*100) : null)
+      } else {
+        const cat = x.categories?.[catFilter]
+        pctDone = cat ? (typeof cat.pct === 'number' ? cat.pct : (cat.total ? Math.round(((cat.done||0)/(cat.total||1))*100) : null)) : null
+      }
+      if (pctDone==null) continue
+      const remaining = Math.max(0, 100 - pctDone)
+      rows.push({ ts, remaining })
+    }
+    const header = `ts,remaining_percent${catFilter==='ALL'?'':'_'+catFilter}`
+    const body = rows.map(r=> `${r.ts},${r.remaining}`).join('\n')
+    const csv = header + '\n' + body + '\n'
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `status-history${catFilter==='ALL'?'':'-'+catFilter}.csv`
+    document.body.appendChild(a); a.click(); a.remove()
+    URL.revokeObjectURL(url)
+  }
+
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-semibold">Live App Status</h1>
-      <div className="text-sm opacity-80">Admin‑editable, realtime. Click a status to change it. Seed loads automatically if empty.</div>
-      <div className="mt-2"><BurndownSparkline /></div>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-xl font-semibold">Live App Status</h1>
+          <div className="text-sm opacity-80">Admin‑editable, realtime. Toggle category to focus the burndown. Export CSV anytime.</div>
+        </div>
+        <div className="flex items-center gap-2">
+          <select className="border rounded px-3 py-2 text-sm" value={catFilter} onChange={e=> setCatFilter(e.target.value as any)}>
+            <option value="ALL">All (overall)</option>
+            {categories.map(c=> <option key={c} value={c}>{c}</option>)}
+          </select>
+          <button className="border rounded px-3 py-2 text-sm" onClick={exportHistoryCSV}>Export CSV</button>
+        </div>
+      </div>
+
+      <div className="mt-2"><BurndownSparkline category={catFilter} /></div>
 
       {categories.map(cat => {
         const list = byCat[cat] || []

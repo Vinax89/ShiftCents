@@ -40,8 +40,6 @@
     "@radix-ui/react-popover": "^1.1.6",
     "@radix-ui/react-progress": "^1.1.2",
     "@radix-ui/react-radio-group": "^1.2.3",
-    "react-day-picker": "^8.10.1",
-    "react-dom": "18.3.1",
     "@radix-ui/react-scroll-area": "^1.2.3",
     "@radix-ui/react-select": "^2.1.6",
     "@radix-ui/react-separator": "^1.1.2",
@@ -64,6 +62,8 @@
     "patch-package": "^8.0.0",
     "pica": "^9.0.1",
     "react": "18.3.1",
+    "react-day-picker": "^8.10.1",
+    "react-dom": "18.3.1",
     "react-hook-form": "^7.54.2",
     "recharts": "^3.0.0",
     "tailwind-merge": "^3.0.1",
@@ -87,7 +87,7 @@
     "rimraf": "^5.0.7",
     "tailwindcss": "3.4.4",
     "typescript": "5.5.2",
-    "vitest": "^2.0.2",
+    "vitest": "^3.2.4",
     "web-vitals": "^4.2.1"
   },
   "packageManager": "pnpm@10.16.1+sha512.0e155aa2629db8672b49e8475da6226aa4bdea85fdcdfdc15350874946d4f3c91faaf64cbdc4a5d1ab8002f473d5c3fcedcd197989cf0390f9badd3c04678706"
