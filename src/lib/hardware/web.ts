@@ -13,7 +13,7 @@ return null
 
 
 export const webHardware: Hardware = {
-async cameraCapture(){ return pwaCapture() },
+async cameraCapture(){ return await pwaCapture() },
 async share(text){ if (navigator.share) await navigator.share({ text }).catch(()=>{}); },
 vibrate(i){ if (navigator.vibrate) navigator.vibrate(i==='heavy'?30:i==='medium'?20:10) },
 async device(){ return { platform: 'web', model: navigator.userAgent, os: navigator.platform as string } },
